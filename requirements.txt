@@ -1,0 +1,16 @@
+LoanDefaultPrediction/
+│
+├── data/
+│   ├── loan_data.csv          # Your dataset
+│   └── data_dictionary.md      # Data dictionary
+│
+├── notebooks/
+│   └── exploratory_analysis.ipynb  # Jupyter Notebook for analysis
+│
+├── src/
+│   ├── data_preprocessing.py   # Data preprocessing scripts
+│   ├── model_training.py       # Model training scripts
+│   └── model_evaluation.py     # Model evaluation scripts
+│
+├── requirements.txt            # Python dependencies
+└── README.md                   # Project overview

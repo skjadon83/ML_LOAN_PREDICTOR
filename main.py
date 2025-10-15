@@ -3,8 +3,13 @@ from pydantic import BaseModel
 import numpy as np
 import pandas as pd
 import joblib
+from src.data_preprocessing import handle_missing_values, encode_categorical
+from src.model_evaluation import evaluate_model
 
 app = FastAPI()
+
+# Load your trained model (update path as needed)
+model = joblib.load('model.pkl')
 
 # Input schema based on Data_Dictionary.csv
 class LoanInput(BaseModel):
@@ -47,9 +52,6 @@ class LoanInput(BaseModel):
     Phone_Change: float
     Credit_Bureau: float
 
-# Load your trained model (update path as needed)
-# model = joblib.load('model.pkl')
-
 @app.get("/")
 def read_root():
     return {"message": "Loan Default Prediction API is running."}
@@ -58,12 +60,28 @@ def read_root():
 def predict_default(data: LoanInput):
     # Convert input to DataFrame for model
     input_df = pd.DataFrame([data.dict()])
-    # prediction = model.predict(input_df)[0]
-    # probability = model.predict_proba(input_df)[0, 1]
-    # For demonstration, return dummy values
-    prediction = 0  # Replace with model prediction
-    probability = 0.1  # Replace with model probability
+    input_df = handle_missing_values(input_df)
+    input_df = encode_categorical(input_df)
+    # Align columns with model training (handle missing columns)
+    model_features = model.feature_names_in_ if hasattr(model, 'feature_names_in_') else input_df.columns
+    for col in model_features:
+        if col not in input_df.columns:
+            input_df[col] = 0
+    input_df = input_df[model_features]
+    prediction = model.predict(input_df)[0]
+    probability = model.predict_proba(input_df)[0, 1]
     return {"default_prediction": int(prediction), "probability": float(probability)}
+
+@app.post("/evaluate")
+def evaluate_endpoint(y_true: list, y_pred: list, y_proba: list = None):
+    """
+    Evaluate model predictions. y_true, y_pred, y_proba should be lists of the same length.
+    """
+    if y_proba is not None:
+        metrics = evaluate_model(y_true, y_pred, y_proba)
+    else:
+        metrics = evaluate_model(y_true, y_pred)
+    return metrics
 
 # Optionally, add a health check endpoint
 @app.get("/health")

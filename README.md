@@ -1,24 +1,15 @@
-### Step 1: Create a New Workspace
+# Loan Default Prediction Project
 
-1. **Open Visual Studio Code**.
-2. **Create a New Folder**:
-   - Go to `File` > `Open Folder...`.
-   - Create a new folder named `LoanDefaultPrediction` (or any name you prefer) and open it.
+This project predicts the likelihood of a borrower defaulting on a loan using machine learning. It includes data preprocessing, feature engineering, model training, evaluation, and deployment via FastAPI.
 
-3. **Create a Workspace**:
-   - Go to `File` > `Save Workspace As...`.
-   - Save the workspace as `LoanDefaultPrediction.code-workspace` in the `LoanDefaultPrediction` folder.
-
-### Step 2: Organize Project Structure
-
-Inside the `LoanDefaultPrediction` folder, create the following subfolders and files:
+## Project Structure
 
 ```
-LoanDefaultPrediction/
+loan-default-prediction/
 │
 ├── data/
-│   ├── loan_data.csv
-│   └── data_dictionary.csv
+│   ├── Dataset.csv
+│   └── Data_Dictionary.csv
 │
 ├── notebooks/
 │   └── exploratory_analysis.ipynb
@@ -28,60 +19,79 @@ LoanDefaultPrediction/
 │   ├── model_training.py
 │   └── model_evaluation.py
 │
+├── main.py                # FastAPI app
 ├── requirements.txt
+├── Dockerfile
 └── README.md
 ```
 
-### Step 3: Create the Dataset
+## Data
+- **Dataset.csv**: Main dataset for training and evaluation.
+- **Data_Dictionary.csv**: Describes each variable in the dataset.
 
-You can create a sample dataset for loan default prediction. Here’s an example of what the `loan_data.csv` file might look like:
+## Setup Instructions
 
-```csv
-loan_id,loan_amount,term,interest_rate,credit_score,income,default
-1,5000,36,15.0,700,60000,0
-2,3000,24,10.0,650,45000,1
-3,15000,60,20.0,720,80000,0
-4,20000,36,18.0,580,30000,1
-5,10000,48,12.0,690,70000,0
-```
-
-### Step 4: Create a Data Dictionary
-
-Create a `data_dictionary.md` file in the `data` folder to describe the dataset. Here’s an example of what it might contain:
-
-```markdown
-# Data Dictionary for Loan Default Prediction
-
-| Column Name       | Description                                           | Data Type |
-|-------------------|-------------------------------------------------------|-----------|
-| loan_id           | Unique identifier for each loan                       | Integer   |
-| loan_amount       | The total amount of the loan                          | Float     |
-| term              | The duration of the loan in months                    | Integer   |
-| interest_rate     | The interest rate of the loan                          | Float     |
-| credit_score      | The credit score of the borrower                      | Integer   |
-| income            | The annual income of the borrower                     | Float     |
-| default           | Target variable indicating if the loan defaulted (1) or not (0) | Integer   |
-```
-
-### Step 5: Create Other Files
-
-1. **`requirements.txt`**: List the necessary Python packages for your project. For example:
+1. **Clone the repository**
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
    ```
-   pandas
-   numpy
-   scikit-learn
-   matplotlib
-   seaborn
-   jupyter
+3. **Run EDA**
+   - Open `notebooks/exploratory_analysis.ipynb` in Jupyter or VS Code.
+4. **Preprocess Data**
+   ```bash
+   python src/data_preprocessing.py
+   ```
+5. **Train Model**
+   ```bash
+   python src/model_training.py
+   ```
+6. **Evaluate Model**
+   ```bash
+   python src/model_evaluation.py
+   ```
+7. **Run API (FastAPI)**
+   ```bash
+   uvicorn main:app --reload
+   ```
+8. **Docker (optional)**
+   ```bash
+   docker build -t loan-default-api .
+   docker run -p 8000:8000 loan-default-api
    ```
 
-2. **`README.md`**: Provide an overview of your project, including its purpose, how to set it up, and how to run the code.
+## API Endpoints
+- `GET /` : Welcome message
+- `POST /predict` : Predict loan default (send JSON with all required fields)
+- `GET /health` : Health check
 
-### Step 6: Open the Workspace
+## Example Data Dictionary
+See `data/Data_Dictionary.csv` for full details.
 
-1. Go to `File` > `Open Workspace...` and select the `LoanDefaultPrediction.code-workspace` file you created.
-2. You should now see your project structure in the Explorer pane.
+| Column Name                | Description                                      |
+|---------------------------|--------------------------------------------------|
+| Client_Income             | Client Income in $                               |
+| Car_Owned                 | Car owned (0=No, 1=Yes)                          |
+| ...                       | ...                                              |
+| Default                   | Target: 1=Defaulted, 0=Not Defaulted             |
 
-### Conclusion
+## Requirements
+- pandas
+- numpy
+- scikit-learn
+- matplotlib
+- seaborn
+- jupyter
+- fastapi
+- uvicorn
+- joblib
+- imbalanced-learn
 
-You have successfully created a new workspace in Visual Studio Code for your loan default prediction project. You can now start adding your code, performing exploratory data analysis, and building your predictive models.
+## Notes
+- Update `main.py` to load your trained model for real predictions.
+- See the notebook for EDA and feature engineering steps.
+- The pipeline handles missing values, outliers, and class imbalance.
+
+---
+
+For more details, see the code and comments in each file.
